@@ -102,9 +102,7 @@ h1 {
          .attr("width", xScale.bandwidth())
          .attr("height", function(d) { return height - yScale(parseInt(d.total)); })
          .attr("id", "graphRect")
-         //.on("mouseover", function(d) { updateTooltip(d);})
-         //.on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-      	 //.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+
 
       	 g.selectAll("#rolloverRect")
       	 	.data(sortedData)
@@ -116,9 +114,12 @@ h1 {
       	 	.attr("position", "absolute")
       	 	.attr("left", function(d, i) { return i*xScale.bandwidth()})
       	 	.attr("opacity", ".05")
-      	 	.on("mouseover", function(d) { d3.select(this).attr("fill", "red"); updateTooltip(d);})
-      	 	.on("mouseout", function(d) { d3.select(this).attr("fill", "black"); resetTooltip();});
+      	 	.attr("id", "rolloverRect")
+      	 	//on actions removed until explore step
+      	 	//.on("mouseover", function(d) { d3.select(this).attr("fill", "red"); updateTooltip(d);})
+      	 	//.on("mouseout", function(d) { d3.select(this).attr("fill", "black"); resetTooltip();});
 
+      	 //initial tooltip text (totals)
 
 		 var tooltipText1 = "Total"; 
 		 var tooltipText2 = "$181B"; 
@@ -156,31 +157,26 @@ h1 {
 		 		.style("font", "32px Verdana")
 		 		.text(tooltipText3);
 		 svg.append("text")
-		 		// .attr("id", "tooltip-percent")
 		 		.attr("x", "575")
 		 		.attr("y", "25")
 		 		.style("font", "14px Verdana")
 		 		.text("Funding Source");
 		 svg.append("text")
-		 		// .attr("id", "tooltip-percent")
 		 		.attr("x", "425")
 		 		.attr("y", "85")
 		 		.style("font", "12px Verdana")
 		 		.text("Federal Funds");
 	     svg.append("text")
-		 		// .attr("id", "tooltip-percent")
 		 		.attr("x", "542")
 		 		.attr("y", "85")
 		 		.style("font", "12px Verdana")
 		 		.text("General Funds");
 		 svg.append("text")
-		 		// .attr("id", "tooltip-percent")
 		 		.attr("x", "659")
 		 		.attr("y", "85")
 		 		.style("font", "12px Verdana")
 		 		.text("Lottery Funds");
 		 svg.append("text")
-		 		// .attr("id", "tooltip-percent")
 		 		.attr("x", "775")
 		 		.attr("y", "85")
 		 		.style("font", "12px Verdana")
@@ -314,7 +310,12 @@ h1 {
 			 	})
 		 	.on("mouseout", function(d) {d3.select(this).attr("fill", "lightcoral")})
 		 	.on("click", function(d) {return nextButtonClick()});
-		 svg.append("text").attr("x", "815").attr("y", "400").text("Next").attr("id", "next").on("click", function(d) {return nextButtonClick()});;
+		 svg.append("text").attr("x", "815").attr("y", "400").text("Next").attr("id", "next")
+		 	.on("mouseover", function(d) {
+			 	svg.select("#next-rect").attr("fill", "crimson")
+			 	})
+		 	.on("mouseout", function(d) {svg.select("next-rect").attr("fill", "lightcoral")})
+		 	.on("click", function(d) {return nextButtonClick()});;
 	
 		 //Define Other Scenes and end with Exploration Mode as the Next Button is clicked
 
@@ -445,7 +446,15 @@ h1 {
 
 			else if (storyState == "Education"){
 
+				//enable rollovers
+
+				g.selectAll("#rolloverRect").on("mouseover", function(d) { d3.select(this).attr("fill", "red"); updateTooltip(d);})
+      	 			.on("mouseout", function(d) { d3.select(this).attr("fill", "black"); resetTooltip();});
+
+      	 		//remove highliting rectangles
 				svg.selectAll("#highlight-rect").remove();
+
+				//setup zoom parameter and reset zoom for graph
 
 				var zoomParameter = 0;
 
@@ -454,6 +463,7 @@ h1 {
 				zoomY(zoomData[0]);
 
 
+				//set text
 
 				expText1 = "Explore the entire budget.  Roll the mouse over different";
 				expText2 = "departments, and zoom the axis with the buttons in the lower left";
@@ -499,9 +509,9 @@ h1 {
 			 		.style("font", "12px Verdana")
 			 		.text("-")
 			 		.on("mouseover", function(d) {
-					 	svg.select("zoomOutButtonRect").attr("fill", "crimson")
+					 	svg.select("#zoomOutButtonRect").attr("fill", "crimson")
 					 	})
-		 			.on("mouseout", function(d) {svg.select("zoomOutButtonRect").attr("fill", "lightcoral")})
+		 			.on("mouseout", function(d) {svg.select("#zoomOutButtonRect").attr("fill", "lightcoral")})
 		 			.on("click", function(d) { zoomParameter = Math.max(zoomParameter -1, 0); zoomY(zoomData[zoomParameter]);});
 
 
@@ -510,6 +520,8 @@ h1 {
 			}
 
 			else if (storyState == "Explore"){
+
+				//final state - clear text and explore (next) button
 
 				svg.selectAll("#highlight-rect").remove();
 
@@ -532,7 +544,6 @@ h1 {
 			}
 
 
-			//svg.select("#description-text1").text(welcomeText2);
 		}
         
 	});
